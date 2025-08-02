@@ -1,0 +1,49 @@
+# フロント・バック・データベースのDockerコンテナを構築するための設定
+
+version: "3.8"
+
+services:
+    frontend:
+        build:
+            context: ./is-app-frontend/is-career-app
+        container_name: is-career-app-frontend
+        ports:
+            - "3000:3000"
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+        volumes:
+            - ./is-app-frontend/is-career-app:/app
+        depends_on:
+            - backend
+
+    backend:
+        build:
+            context: ./is-app-backend/is-career-app-backend
+            dockerfile: Dockerfile
+        container_name: is-career-app-backend
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./is-app-backend/is-career-app-backend:/app
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/is-career-app-db
+            SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+            SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+        depends_on:
+            - db
+
+    db:
+        image: postgres:16
+        container_name: is-career-app-db
+        environment:
+            POSTGRES_DB: is-career-app-db
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        ports:
+            - "5432:5432"
+        volumes:
+            - db-data:/var/lib/postgresql/data
+            - ./initdb:/docker-entrypoint-initdb.d
+
+volumes:
+    db-data:
