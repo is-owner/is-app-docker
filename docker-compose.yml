@@ -7,13 +7,13 @@ services:
             dockerfile: Dockerfile
         container_name: is-career-app-frontend
         ports:
-            - "5173:5173" # Viteは内部5173を使用
+            - "5173:5173"
         environment:
             - CHOKIDAR_USEPOLLING=true
         volumes:
             - ./is-app-frontend/is-career-app:/app
             - /app/node_modules
-        command: npm run dev -- --host
+        command: npm run dev -- --host 0.0.0.0 --port 5173
         depends_on:
             - backend
 
